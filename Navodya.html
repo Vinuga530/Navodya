@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Navodya | Elegant Essence</title>
+  <meta name="description" content="A premium experience celebrating the elegance and grace of Navodya.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Outfit:wght@200;300;500&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      user-select: none;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      touch-action: none;
+      background: #130318;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    /* ── Scene wrapper ── */
+    #scene {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+    }
+
+    canvas {
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    #canvas-bg    { z-index: 1; }
+    #canvas-rain  { z-index: 2; pointer-events: none; }
+    #canvas-rip   { z-index: 4; pointer-events: none; }
+    #bloom-canvas { z-index: 3; pointer-events: none; }
+
+    /* ── Card ── */
+    .display-card {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      z-index: 10;
+      padding: 40px 60px;
+      border-radius: 24px;
+      background: rgba(20, 4, 30, 0.35);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 180, 210, 0.25);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 40px rgba(216, 92, 137, 0.12);
+      animation: slideUpIn 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      transition: box-shadow 0.4s ease;
+      transform-style: preserve-3d;
+    }
+
+    @keyframes slideUpIn {
+      0%   { opacity: 0; transform: translate(-50%, -44%) scale(0.97); }
+      100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    }
+
+    /* ── Lotus ── */
+    .lotus-container {
+      width: 160px;
+      height: 160px;
+      margin: 0 auto 20px auto;
+      filter: drop-shadow(0 12px 28px rgba(216, 92, 137, 0.4));
+      animation: gentleBreath 6s ease-in-out infinite;
+    }
+
+    @keyframes gentleBreath {
+      0%, 100% { transform: scale(1) translateY(0); }
+      50%       { transform: scale(1.05) translateY(-7px); }
+    }
+
+    .svg-lotus { width: 100%; height: 100%; }
+
+    /* ── Heading ── */
+    h1.navodya {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: clamp(2.4rem, 8vw, 5.5rem);
+      font-weight: 700;
+      letter-spacing: clamp(4px, 1.5vw, 10px);
+      margin-bottom: 15px;
+      background: linear-gradient(135deg, #d85c89 10%, #ff8ca3 40%, #fecfef 70%, #d85c89 100%);
+      background-size: 300% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shineGrad 8s linear infinite;
+      line-height: 1.2;
+    }
+
+    @keyframes shineGrad {
+      to { background-position: 300% center; }
+    }
+
+    /* ── Subtext ── */
+    .subtext {
+      font-size: 0.85rem;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      font-weight: 300;
+      color: rgba(255, 200, 225, 0.7);
+      position: relative;
+      display: inline-block;
+      animation: fadeInSub 2s ease-out 0.6s both;
+      opacity: 0;
+    }
+
+    .subtext::before,
+    .subtext::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      width: 28px;
+      height: 1px;
+      background: linear-gradient(to right, transparent, #d85c89, transparent);
+    }
+    .subtext::before { right: 100%; margin-right: 12px; }
+    .subtext::after  { left:  100%; margin-left:  12px; }
+
+    @keyframes fadeInSub {
+      to { opacity: 1; }
+    }
+
+    /* ── Footer ── */
+    .aesthetic-footer {
+      position: absolute;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.7rem;
+      letter-spacing: 3px;
+      color: rgba(255, 190, 215, 0.35);
+      text-transform: uppercase;
+      font-weight: 300;
+      z-index: 20;
+      white-space: nowrap;
+    }
+
+    /* ── Drips ── */
+    .drip {
+      position: absolute;
+      bottom: -1px;
+      width: 3px;
+      background: linear-gradient(to bottom, rgba(255, 210, 235, 0.9), rgba(255, 140, 195, 0.2));
+      border-radius: 0 0 4px 4px;
+      pointer-events: none;
+      transform: translateX(-50%);
+    }
+
+    /* ── Mobile tweaks ── */
+    @media (max-width: 600px) {
+      .display-card {
+        padding: 28px 22px;
+        width: 88%;
+      }
+      .lotus-container {
+        width: 110px;
+        height: 110px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div id="scene">
+  <canvas id="canvas-bg"></canvas>
+  <canvas id="canvas-rain"></canvas>
+  <canvas id="bloom-canvas"></canvas>
+  <canvas id="canvas-rip"></canvas>
+
+  <main class="display-card" id="card">
+    <!-- Lotus SVG (original) -->
+    <div class="lotus-container">
+      <svg class="svg-lotus" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="petalGrad1" x1="0%" y1="100%" x2="0%" y2="0%">
+            <stop offset="0%" stop-color="#d85c89" />
+            <stop offset="100%" stop-color="#ffa6c9" />
+          </linearGradient>
+          <linearGradient id="petalGrad2" x1="0%" y1="100%" x2="0%" y2="0%">
+            <stop offset="0%" stop-color="#ff8aa4" />
+            <stop offset="100%" stop-color="#ffeef4" />
+          </linearGradient>
+          <linearGradient id="petalGrad3" x1="0%" y1="100%" x2="0%" y2="0%">
+            <stop offset="0%" stop-color="#f9c5d1" />
+            <stop offset="100%" stop-color="#ffffff" />
+          </linearGradient>
+        </defs>
+        <path d="M50,88 C25,70 8,50 50,12 C92,50 75,70 50,88 Z" fill="url(#petalGrad1)" opacity="0.7" />
+        <path d="M50,88 C12,78 -10,45 35,32 C45,50 50,88 50,88 Z" fill="url(#petalGrad2)" opacity="0.8" />
+        <path d="M50,88 C88,78 110,45 65,32 C55,50 50,88 50,88 Z" fill="url(#petalGrad2)" opacity="0.8" />
+        <path d="M50,88 C2,82 -2,55 40,45 C45,65 50,88 50,88 Z" fill="url(#petalGrad1)" opacity="0.85" />
+        <path d="M50,88 C98,82 102,55 60,45 C55,65 50,88 50,88 Z" fill="url(#petalGrad1)" opacity="0.85" />
+        <path d="M50,88 C22,90 15,65 45,58 C50,75 50,88 50,88 Z" fill="url(#petalGrad3)" opacity="0.95" />
+        <path d="M50,88 C78,90 85,65 55,58 C50,75 50,88 50,88 Z" fill="url(#petalGrad3)" opacity="0.95" />
+        <path d="M50,88 C35,90 28,85 50,68 C72,85 65,90 50,88 Z" fill="#ffffff" opacity="0.98" />
+      </svg>
+    </div>
+
+    <!-- Name with drip spans -->
+    <h1 class="navodya" id="name-heading">
+      <span class="letter" id="l0">N</span><span class="letter" id="l1">a</span><span class="letter" id="l2">v</span><span class="letter" id="l3">o</span><span class="letter" id="l4">d</span><span class="letter" id="l5">y</span><span class="letter" id="l6">a</span>
+    </h1>
+    <div class="subtext">Elegant Blossom</div>
+  </main>
+</div>
+
+<footer class="aesthetic-footer">Aesthetic Renewal</footer>
+
+<script>
+  // ── Dimensions ──
+  let W = window.innerWidth, H = window.innerHeight;
+  const isMobile = () => window.innerWidth < 600;
+  const POND_RATIO = 0.56;
+  let POND_Y = H * POND_RATIO;
+
+  function resizeCanvas(id) {
+    const c = document.getElementById(id);
+    c.width = W; c.height = H;
+    return c.getContext('2d');
+  }
+
+  let bgCtx   = resizeCanvas('canvas-bg');
+  let rainCtx = resizeCanvas('canvas-rain');
+  let ripCtx  = resizeCanvas('canvas-rip');
+  let pelCtx  = resizeCanvas('bloom-canvas');
+
+  // ── Stars ──
+  let stars = [];
+  function initStars() {
+    const count = isMobile() ? 55 : 100;
+    stars = Array.from({ length: count }, () => ({
+      x: Math.random() * W,
+      y: Math.random() * POND_Y * 0.52,
+      r: 0.4 + Math.random() * 1.4,
+      a: 0.35 + Math.random() * 0.65,
+      t: Math.random() * Math.PI * 2,
+      ts: 0.018 + Math.random() * 0.025,
+    }));
+  }
+
+  // ── Lotus draw ──
+  function drawLotus(ctx, x, y, size) {
+    ctx.save(); ctx.translate(x, y);
+    ctx.fillStyle = '#1e5228';
+    ctx.beginPath();
+    ctx.ellipse(0, size * 0.55, size * 1.05, size * 0.3, 0, 0, Math.PI * 2);
+    ctx.fill();
+    for (let i = 0; i < 8; i++) {
+      const a = (i / 8) * Math.PI * 2 - Math.PI / 2;
+      ctx.save(); ctx.rotate(a);
+      const pg = ctx.createLinearGradient(0, 0, 0, -size);
+      pg.addColorStop(0, '#d45582'); pg.addColorStop(0.5, '#ef8aac'); pg.addColorStop(1, '#ffd3e8');
+      ctx.fillStyle = pg;
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.bezierCurveTo(-size*0.23, -size*0.27, -size*0.13, -size*0.87, 0, -size*0.92);
+      ctx.bezierCurveTo( size*0.13, -size*0.87,  size*0.23, -size*0.27, 0, 0);
+      ctx.fill(); ctx.restore();
+    }
+    for (let i = 0; i < 6; i++) {
+      const a = (i / 6) * Math.PI * 2;
+      ctx.save(); ctx.rotate(a); ctx.globalAlpha = 0.88;
+      const pg2 = ctx.createLinearGradient(0, 0, 0, -size * 0.77);
+      pg2.addColorStop(0, '#ff86ab'); pg2.addColorStop(1, '#ffdcef');
+      ctx.fillStyle = pg2;
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.bezierCurveTo(-size*0.17, -size*0.22, -size*0.1, -size*0.67, 0, -size*0.72);
+      ctx.bezierCurveTo( size*0.1,  -size*0.67,  size*0.17, -size*0.22, 0, 0);
+      ctx.fill(); ctx.restore();
+    }
+    const cg = ctx.createRadialGradient(0, -size*0.08, 0, 0, -size*0.08, size*0.2);
+    cg.addColorStop(0, '#fff099'); cg.addColorStop(0.5, '#f8c455'); cg.addColorStop(1, '#e79060');
+    ctx.fillStyle = cg;
+    ctx.beginPath();
+    ctx.ellipse(0, -size*0.08, size*0.2, size*0.16, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // ── Lotus positions ──
+  let LOTUSES = [];
+  function initLotuses() {
+    const m = isMobile();
+    LOTUSES = m ? [
+      { x: W*0.06, y: POND_Y+28,  s: 17 },
+      { x: W*0.18, y: POND_Y+58,  s: 21 },
+      { x: W*0.05, y: POND_Y+98,  s: 13 },
+      { x: W*0.88, y: POND_Y+32,  s: 19 },
+      { x: W*0.95, y: POND_Y+76,  s: 15 },
+      { x: W*0.82, y: POND_Y+112, s: 21 },
+      { x: W*0.23, y: POND_Y+108, s: 13 },
+      { x: W*0.77, y: POND_Y+98,  s: 16 },
+      { x: W*0.10, y: POND_Y+148, s: 11 },
+      { x: W*0.91, y: POND_Y+152, s: 12 },
+    ] : [
+      { x: W*0.07, y: POND_Y+40,  s: 28 },
+      { x: W*0.18, y: POND_Y+72,  s: 35 },
+      { x: W*0.05, y: POND_Y+112, s: 22 },
+      { x: W*0.82, y: POND_Y+52,  s: 30 },
+      { x: W*0.92, y: POND_Y+92,  s: 25 },
+      { x: W*0.88, y: POND_Y+142, s: 32 },
+      { x: W*0.25, y: POND_Y+132, s: 20 },
+      { x: W*0.75, y: POND_Y+122, s: 24 },
+      { x: W*0.12, y: POND_Y+172, s: 18 },
+      { x: W*0.90, y: POND_Y+202, s: 20 },
+      { x: W*0.03, y: POND_Y+202, s: 15 },
+    ];
+  }
+
+  // ── Draw background ──
+  function drawBackground() {
+    bgCtx.clearRect(0, 0, W, H);
+
+    // Sky
+    const sky = bgCtx.createLinearGradient(0, 0, 0, POND_Y);
+    sky.addColorStop(0,    '#120218');
+    sky.addColorStop(0.18, '#3c0b36');
+    sky.addColorStop(0.42, '#bc4370');
+    sky.addColorStop(0.62, '#de7b60');
+    sky.addColorStop(0.82, '#f3b172');
+    sky.addColorStop(1,    '#fcd898');
+    bgCtx.fillStyle = sky;
+    bgCtx.fillRect(0, 0, W, POND_Y);
+
+    // Stars
+    stars.forEach(s => {
+      s.t += s.ts;
+      const alpha = s.a * (0.55 + 0.45 * Math.sin(s.t));
+      bgCtx.save();
+      bgCtx.globalAlpha = alpha;
+      bgCtx.fillStyle = '#fff';
+      bgCtx.beginPath();
+      bgCtx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      bgCtx.fill();
+      bgCtx.restore();
+    });
+
+    // Clouds
+    const clouds = [
+      { x:W*0.13, y:H*0.055, rx:W*0.14, ry:H*0.038, c:'rgba(200,75,125,0.42)' },
+      { x:W*0.58, y:H*0.040, rx:W*0.18, ry:H*0.032, c:'rgba(215,95,90,0.36)' },
+      { x:W*0.86, y:H*0.085, rx:W*0.13, ry:H*0.028, c:'rgba(185,60,115,0.40)' },
+      { x:W*0.40, y:H*0.120, rx:W*0.20, ry:H*0.038, c:'rgba(225,115,82,0.26)' },
+      { x:W*0.72, y:H*0.140, rx:W*0.16, ry:H*0.030, c:'rgba(200,80,105,0.30)' },
+    ];
+    clouds.forEach(cl => {
+      const g = bgCtx.createRadialGradient(cl.x, cl.y, 0, cl.x, cl.y, Math.max(cl.rx, cl.ry));
+      g.addColorStop(0, cl.c); g.addColorStop(1, 'transparent');
+      bgCtx.save(); bgCtx.fillStyle = g;
+      bgCtx.beginPath(); bgCtx.ellipse(cl.x, cl.y, cl.rx, cl.ry, 0, 0, Math.PI * 2);
+      bgCtx.fill(); bgCtx.restore();
+    });
+
+    // Hill silhouette
+    bgCtx.save(); bgCtx.fillStyle = '#1c0518';
+    bgCtx.beginPath(); bgCtx.moveTo(0, POND_Y);
+    for (let x = 0; x <= W; x += 28) {
+      const y = POND_Y - 20 - Math.sin(x * 0.017) * 18 - Math.sin(x * 0.048) * 8;
+      bgCtx.lineTo(x, y);
+    }
+    bgCtx.lineTo(W, POND_Y); bgCtx.closePath(); bgCtx.fill(); bgCtx.restore();
+
+    // Pond
+    const pond = bgCtx.createLinearGradient(0, POND_Y, 0, H);
+    pond.addColorStop(0,    '#bc4e72');
+    pond.addColorStop(0.15, '#982d58');
+    pond.addColorStop(0.45, '#731840');
+    pond.addColorStop(0.75, '#480a28');
+    pond.addColorStop(1,    '#1b0514');
+    bgCtx.fillStyle = pond;
+    bgCtx.fillRect(0, POND_Y, W, H - POND_Y);
+
+    // Shimmer
+    bgCtx.save(); bgCtx.globalAlpha = 0.14;
+    for (let i = 0; i < 7; i++) {
+      const rx = W * (0.28 + i * 0.075);
+      const rw = 8 + i * 3.5, rh = 52 + i * 14;
+      const rg = bgCtx.createLinearGradient(rx, POND_Y, rx, POND_Y + rh);
+      rg.addColorStop(0, '#ffc0a0'); rg.addColorStop(1, 'transparent');
+      bgCtx.fillStyle = rg; bgCtx.fillRect(rx - rw/2, POND_Y, rw, rh);
+    }
+    bgCtx.restore();
+
+    // Water edge
+    bgCtx.save(); bgCtx.strokeStyle = 'rgba(255,175,135,0.28)'; bgCtx.lineWidth = 1.5;
+    bgCtx.beginPath(); bgCtx.moveTo(0, POND_Y); bgCtx.lineTo(W, POND_Y); bgCtx.stroke(); bgCtx.restore();
+
+    // Lotuses
+    LOTUSES.forEach(l => drawLotus(bgCtx, l.x, l.y, l.s));
+  }
+
+  // ── Rain ──
+  let drops = [];
+  function initRain() {
+    const count = isMobile() ? 130 : 210;
+    drops = Array.from({ length: count }, () => ({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      len: (isMobile() ? 7 : 11) + Math.random() * 13,
+      speed: 7 + Math.random() * 7,
+      alpha: 0.22 + Math.random() * 0.42,
+      thick: 0.4 + Math.random() * 0.85,
+    }));
+  }
+
+  function drawRain() {
+    rainCtx.clearRect(0, 0, W, H);
+    drops.forEach(d => {
+      d.y += d.speed; d.x -= d.speed * 0.1;
+      if (d.y > H + d.len) { d.y = -d.len; d.x = Math.random() * W; }
+      rainCtx.beginPath();
+      rainCtx.strokeStyle = `rgba(255,212,240,${d.alpha})`;
+      rainCtx.lineWidth = d.thick;
+      rainCtx.moveTo(d.x, d.y);
+      rainCtx.lineTo(d.x - d.len * 0.1, d.y + d.len);
+      rainCtx.stroke();
+    });
+  }
+
+  // ── Ripples ──
+  let ripples = [], ripTimer = 0;
+  function spawnRipple(x, y) {
+    ripples.push({ x, y, r: 0, maxR: (isMobile() ? 18 : 28) + Math.random() * 22, alpha: 0.6, spd: 0.4 + Math.random() * 0.4 });
+  }
+  function drawRipples() {
+    ripTimer++;
+    if (ripTimer % 4 === 0) spawnRipple(Math.random() * W, POND_Y + Math.random() * (H - POND_Y));
+    ripCtx.clearRect(0, 0, W, H);
+    for (let i = ripples.length - 1; i >= 0; i--) {
+      const rp = ripples[i];
+      rp.r += rp.spd; rp.alpha -= 0.013;
+      if (rp.alpha <= 0 || rp.r > rp.maxR) { ripples.splice(i, 1); continue; }
+      ripCtx.save();
+      ripCtx.strokeStyle = `rgba(255,185,220,${rp.alpha})`;
+      ripCtx.lineWidth = 1;
+      ripCtx.beginPath();
+      ripCtx.ellipse(rp.x, rp.y, rp.r, rp.r * 0.32, 0, 0, Math.PI * 2);
+      ripCtx.stroke(); ripCtx.restore();
+    }
+  }
+
+  // ── Letter drips ──
+  const LETTERS = ['l0','l1','l2','l3','l4','l5','l6'];
+  const letterDrips = LETTERS.map(() => ({ drops: [], timer: Math.floor(Math.random() * 50) }));
+
+  function animateDrips() {
+    LETTERS.forEach((id, i) => {
+      const ld = letterDrips[i];
+      ld.timer--;
+      if (ld.timer <= 0) {
+        ld.drops.push({
+          len: 0,
+          speed: 0.65 + Math.random() * 1.1,
+          maxLen: (isMobile() ? 14 : 20) + Math.random() * 35,
+          leftPct: 22 + Math.random() * 56,
+        });
+        ld.timer = 28 + Math.floor(Math.random() * 55);
+      }
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.querySelectorAll('.drip').forEach(d => d.remove());
+      for (let j = ld.drops.length - 1; j >= 0; j--) {
+        const dr = ld.drops[j];
+        dr.len += dr.speed;
+        if (dr.len > dr.maxLen) {
+          ld.drops.splice(j, 1);
+          const rect = el.getBoundingClientRect();
+          spawnRipple(rect.left + rect.width * (dr.leftPct / 100), POND_Y + 8 + Math.random() * 22);
+          continue;
+        }
+        const dEl = document.createElement('div');
+        dEl.className = 'drip';
+        dEl.style.height = dr.len + 'px';
+        dEl.style.left = dr.leftPct + '%';
+        dEl.style.opacity = String(0.9 - (dr.len / dr.maxLen) * 0.3);
+        el.appendChild(dEl);
+      }
+    });
+  }
+
+  // ── Floating petals (original) ──
+  class Petal {
+    constructor() { this.reset(); this.y = Math.random() * H; }
+    reset() {
+      this.x = Math.random() * W;
+      this.y = -20 - Math.random() * 50;
+      this.size = Math.random() * 9 + 5;
+      this.speedY = Math.random() * 0.7 + 0.35;
+      this.speedX = Math.random() * 0.4 - 0.2;
+      this.angle = Math.random() * Math.PI * 2;
+      this.angleSpeed = (Math.random() - 0.5) * 0.014;
+      const hues = [340, 350, 0, 15];
+      this.color = `hsla(${hues[Math.floor(Math.random()*hues.length)]},88%,84%,${Math.random()*0.28+0.35})`;
+      this.osc = Math.random() * 1.4;
+      this.oscSpd = Math.random() * 0.01 + 0.004;
+      this.t = Math.random() * 100;
+    }
+    draw() {
+      pelCtx.save(); pelCtx.translate(this.x, this.y); pelCtx.rotate(this.angle);
+      pelCtx.beginPath(); pelCtx.moveTo(0, 0);
+      pelCtx.bezierCurveTo(this.size/2,-this.size/2,this.size,-this.size/4,this.size,0);
+      pelCtx.bezierCurveTo(this.size,this.size/4,this.size/2,this.size/2,0,0);
+      pelCtx.fillStyle = this.color;
+      pelCtx.fill(); pelCtx.restore();
+    }
+    update(mx, my) {
+      this.t += this.oscSpd;
+      this.y += this.speedY;
+      this.x += this.speedX + Math.sin(this.t) * this.osc;
+      this.angle += this.angleSpeed;
+      const dx = this.x - mx, dy = this.y - my;
+      const dist = Math.sqrt(dx*dx+dy*dy);
+      if (dist < 180) {
+        const f = (180 - dist) / 180;
+        this.x += (dx/dist)*f*2.4;
+        this.y += (dy/dist)*f*1.4;
+      }
+      if (this.y > H+20) this.reset();
+      if (this.x > W+20) this.x = -20;
+      if (this.x < -20) this.x = W+20;
+    }
+  }
+
+  let petals = [];
+  function initPetals() {
+    const count = Math.min(isMobile() ? 28 : 50, Math.floor((W * H) / 20000));
+    petals = Array.from({ length: count }, () => new Petal());
+  }
+
+  // ── Mouse / touch ──
+  let mouseX = -1000, mouseY = -1000;
+  window.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
+  window.addEventListener('touchmove', e => {
+    if (e.touches.length > 0) { mouseX = e.touches[0].clientX; mouseY = e.touches[0].clientY; }
+  }, { passive: true });
+
+  // ── Card tilt ──
+  const card = document.getElementById('card');
+  document.addEventListener('mousemove', e => {
+    const cx = W/2, cy = H/2;
+    const tX = ((e.clientY - cy) / cy) * -8;
+    const tY = ((e.clientX - cx) / cx) *  8;
+    card.style.transform = `translate(-50%, -50%) perspective(1000px) rotateX(${tX}deg) rotateY(${tY}deg)`;
+  });
+  document.addEventListener('mouseleave', () => {
+    card.style.transform = `translate(-50%, -50%) perspective(1000px) rotateX(0deg) rotateY(0deg)`;
+  });
+
+  // ── Main loop ──
+  function loop() {
+    drawBackground();
+    drawRain();
+    pelCtx.clearRect(0, 0, W, H);
+    petals.forEach(p => { p.update(mouseX, mouseY); p.draw(); });
+    drawRipples();
+    animateDrips();
+    requestAnimationFrame(loop);
+  }
+
+  // ── Init ──
+  function init() {
+    W = window.innerWidth; H = window.innerHeight; POND_Y = H * POND_RATIO;
+    [bgCtx, rainCtx, ripCtx, pelCtx].forEach(ctx => { ctx.canvas.width = W; ctx.canvas.height = H; });
+    initStars(); initLotuses(); initRain(); initPetals();
+  }
+
+  window.addEventListener('resize', init);
+  init();
+  loop();
+</script>
+</body>
+</html>
