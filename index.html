@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Navodya | Elegant Essence</title>
-  <meta name="description" content="A premium experience celebrating the elegance and grace of Navodya.">
+  <title>Navodya & VinugaK</title>
+  <meta name="description" content="Two worlds. One place.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Outfit:wght@200;300;500&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Outfit:wght@200;300;400&family=Share+Tech+Mono&display=swap"
+    rel="stylesheet">
   <style>
     * {
       margin: 0;
@@ -16,572 +19,996 @@
       user-select: none;
     }
 
-    html, body {
+    html,
+    body {
       width: 100%;
       height: 100%;
       overflow: hidden;
       touch-action: none;
-      background: #130318;
-      font-family: 'Outfit', sans-serif;
     }
 
-    /* ── Scene wrapper ── */
-    #scene {
+    /* ── Viewport container ── */
+    #viewport {
       position: relative;
       width: 100%;
       height: 100vh;
+      overflow: hidden;
     }
 
-    canvas {
-      display: block;
+    /* ── Pages ── */
+    .page {
       position: absolute;
       top: 0;
       left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 1.1s cubic-bezier(0.4, 0, 0.2, 1);
+      will-change: opacity;
     }
 
-    #canvas-bg    { z-index: 1; }
-    #canvas-rain  { z-index: 2; pointer-events: none; }
-    #canvas-rip   { z-index: 4; pointer-events: none; }
-    #bloom-canvas { z-index: 3; pointer-events: none; }
+    .page.active {
+      opacity: 1;
+      pointer-events: all;
+    }
 
-    /* ── Card ── */
-    .display-card {
+    /* ════════════════════════════════════════
+   HER SIDE — Navodya
+════════════════════════════════════════ */
+    #page-her {
+      background: #130318;
+    }
+
+    #her-bg,
+    #her-rain,
+    #her-petals,
+    #her-rip {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      pointer-events: none;
+    }
+
+    #her-bg {
+      z-index: 1;
+    }
+
+    #her-rain {
+      z-index: 2;
+    }
+
+    #her-petals {
+      z-index: 3;
+    }
+
+    #her-rip {
+      z-index: 4;
+    }
+
+    .her-card {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
       text-align: center;
       z-index: 10;
-      padding: 40px 60px;
-      border-radius: 24px;
-      background: rgba(20, 4, 30, 0.35);
+      padding: 36px 52px;
+      border-radius: 22px;
+      background: rgba(18, 3, 26, 0.38);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
-      border: 1px solid rgba(255, 180, 210, 0.25);
-      box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 40px rgba(216, 92, 137, 0.12);
-      animation: slideUpIn 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-      transition: box-shadow 0.4s ease;
-      transform-style: preserve-3d;
+      border: 1px solid rgba(255, 175, 210, 0.22);
+      box-shadow: 0 18px 55px rgba(0, 0, 0, 0.45), 0 0 35px rgba(216, 92, 137, 0.1);
+      animation: slideUp 1.8s cubic-bezier(0.16, 1, 0.3, 1) both;
     }
 
-    @keyframes slideUpIn {
-      0%   { opacity: 0; transform: translate(-50%, -44%) scale(0.97); }
-      100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translate(-50%, -44%) scale(0.97);
+      }
+
+      to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
     }
 
-    /* ── Lotus ── */
-    .lotus-container {
-      width: 160px;
-      height: 160px;
-      margin: 0 auto 20px auto;
-      filter: drop-shadow(0 12px 28px rgba(216, 92, 137, 0.4));
-      animation: gentleBreath 6s ease-in-out infinite;
+    .her-lotus {
+      width: 140px;
+      height: 140px;
+      margin: 0 auto 18px;
+      filter: drop-shadow(0 10px 24px rgba(216, 92, 137, 0.45));
+      animation: breathe 6s ease-in-out infinite;
     }
 
-    @keyframes gentleBreath {
-      0%, 100% { transform: scale(1) translateY(0); }
-      50%       { transform: scale(1.05) translateY(-7px); }
+    @keyframes breathe {
+
+      0%,
+      100% {
+        transform: scale(1) translateY(0);
+      }
+
+      50% {
+        transform: scale(1.05) translateY(-6px);
+      }
     }
 
-    .svg-lotus { width: 100%; height: 100%; }
-
-    /* ── Heading ── */
-    h1.navodya {
+    .her-name {
       font-family: 'Cinzel Decorative', serif;
-      font-size: clamp(2.4rem, 8vw, 5.5rem);
+      font-size: clamp(2.2rem, 7.5vw, 5rem);
       font-weight: 700;
-      letter-spacing: clamp(4px, 1.5vw, 10px);
-      margin-bottom: 15px;
+      letter-spacing: clamp(3px, 1.2vw, 9px);
       background: linear-gradient(135deg, #d85c89 10%, #ff8ca3 40%, #fecfef 70%, #d85c89 100%);
       background-size: 300% auto;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      animation: shineGrad 8s linear infinite;
+      animation: shineG 8s linear infinite;
       line-height: 1.2;
+      margin-bottom: 12px;
     }
 
-    @keyframes shineGrad {
-      to { background-position: 300% center; }
+    @keyframes shineG {
+      to {
+        background-position: 300% center;
+      }
     }
 
-    /* ── Subtext ── */
-    .subtext {
-      font-size: 0.85rem;
+    .her-sub {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.8rem;
       letter-spacing: 6px;
       text-transform: uppercase;
       font-weight: 300;
-      color: rgba(255, 200, 225, 0.7);
-      position: relative;
+      color: rgba(255, 200, 225, 0.65);
       display: inline-block;
-      animation: fadeInSub 2s ease-out 0.6s both;
-      opacity: 0;
+      animation: fadeI 2s ease-out 0.7s both;
+      position: relative;
     }
 
-    .subtext::before,
-    .subtext::after {
+    .her-sub::before,
+    .her-sub::after {
       content: "";
       position: absolute;
       top: 50%;
-      width: 28px;
+      width: 26px;
       height: 1px;
       background: linear-gradient(to right, transparent, #d85c89, transparent);
     }
-    .subtext::before { right: 100%; margin-right: 12px; }
-    .subtext::after  { left:  100%; margin-left:  12px; }
 
-    @keyframes fadeInSub {
-      to { opacity: 1; }
+    .her-sub::before {
+      right: 100%;
+      margin-right: 10px;
     }
 
-    /* ── Footer ── */
-    .aesthetic-footer {
-      position: absolute;
-      bottom: 18px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 0.7rem;
-      letter-spacing: 3px;
-      color: rgba(255, 190, 215, 0.35);
-      text-transform: uppercase;
-      font-weight: 300;
-      z-index: 20;
-      white-space: nowrap;
+    .her-sub::after {
+      left: 100%;
+      margin-left: 10px;
     }
 
-    /* ── Drips ── */
+    @keyframes fadeI {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
     .drip {
       position: absolute;
       bottom: -1px;
       width: 3px;
-      background: linear-gradient(to bottom, rgba(255, 210, 235, 0.9), rgba(255, 140, 195, 0.2));
+      background: linear-gradient(to bottom, rgba(255, 210, 235, 0.9), rgba(255, 140, 195, 0.15));
       border-radius: 0 0 4px 4px;
       pointer-events: none;
       transform: translateX(-50%);
     }
 
-    /* ── Mobile tweaks ── */
-    @media (max-width: 600px) {
-      .display-card {
-        padding: 28px 22px;
-        width: 88%;
+    /* ════════════════════════════════════════
+   MY SIDE — VinugaK
+════════════════════════════════════════ */
+    #page-me {
+      background: #010a14;
+    }
+
+    #me-bg,
+    #me-particles {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      pointer-events: none;
+    }
+
+    #me-bg {
+      z-index: 1;
+    }
+
+    #me-particles {
+      z-index: 2;
+    }
+
+    .me-card {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      z-index: 10;
+      padding: 38px 54px;
+      border-radius: 4px;
+      background: rgba(0, 10, 22, 0.55);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(0, 180, 255, 0.18);
+      box-shadow:
+        0 0 0 1px rgba(0, 180, 255, 0.06),
+        0 20px 60px rgba(0, 0, 0, 0.7),
+        0 0 40px rgba(0, 180, 255, 0.06),
+        inset 0 0 30px rgba(0, 20, 50, 0.4);
+      animation: slideUp 1.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    /* Shield icon */
+    .shield-wrap {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 18px;
+      position: relative;
+      animation: shieldPulse 4s ease-in-out infinite;
+      filter: drop-shadow(0 0 18px rgba(0, 180, 255, 0.6));
+    }
+
+    @keyframes shieldPulse {
+
+      0%,
+      100% {
+        filter: drop-shadow(0 0 18px rgba(0, 180, 255, 0.6));
       }
-      .lotus-container {
-        width: 110px;
-        height: 110px;
+
+      50% {
+        filter: drop-shadow(0 0 32px rgba(0, 220, 255, 0.9));
+      }
+    }
+
+    .shield-svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .me-name {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: clamp(2rem, 7vw, 4.6rem);
+      font-weight: 700;
+      letter-spacing: clamp(2px, 1vw, 7px);
+      color: #fff;
+      text-shadow: 0 0 20px rgba(0, 180, 255, 0.7), 0 0 50px rgba(0, 140, 220, 0.3);
+      margin-bottom: 8px;
+      position: relative;
+      display: inline-block;
+    }
+
+    .me-name.glitch {
+      animation: glitchAnim 0.2s steps(2) forwards;
+    }
+
+    @keyframes glitchAnim {
+      0% {
+        text-shadow: 0 0 20px rgba(0, 180, 255, 0.7), 3px 0 #ff003c, -3px 0 #00f0ff;
+      }
+
+      25% {
+        text-shadow: 0 0 20px rgba(0, 180, 255, 0.7), -3px 0 #ff003c, 3px 0 #00f0ff;
+        clip-path: inset(20% 0 50% 0);
+      }
+
+      50% {
+        text-shadow: 0 0 20px rgba(0, 180, 255, 0.7), 3px 0 #ff003c, -3px 0 #00f0ff;
+        clip-path: inset(60% 0 10% 0);
+      }
+
+      75% {
+        text-shadow: 0 0 20px rgba(0, 180, 255, 0.7), -2px 0 #ff003c, 2px 0 #00f0ff;
+      }
+
+      100% {
+        text-shadow: 0 0 20px rgba(0, 180, 255, 0.7), 0 0 50px rgba(0, 140, 220, 0.3);
+      }
+    }
+
+    .me-tagline {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: clamp(0.6rem, 1.5vw, 0.78rem);
+      color: rgba(0, 200, 255, 0.6);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+      animation: fadeI 2s ease-out 0.8s both;
+    }
+
+    .me-roles {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: clamp(0.55rem, 1.3vw, 0.7rem);
+      color: rgba(0, 180, 255, 0.38);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      animation: fadeI 2s ease-out 1.1s both;
+      line-height: 1.9;
+    }
+
+    .me-roles span {
+      display: block;
+    }
+
+    .me-roles span::before {
+      content: "> ";
+      color: rgba(0, 255, 180, 0.55);
+    }
+
+    /* scan line */
+    .me-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(0deg,
+          transparent,
+          transparent 2px,
+          rgba(0, 0, 0, 0.06) 2px,
+          rgba(0, 0, 0, 0.06) 4px);
+      border-radius: 4px;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .me-card>* {
+      position: relative;
+      z-index: 2;
+    }
+
+    /* corner accents */
+    .me-card::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      border-radius: 4px;
+      background:
+        linear-gradient(90deg, rgba(0, 180, 255, 0.5) 12px, transparent 12px) top left/100% 1px no-repeat,
+        linear-gradient(180deg, rgba(0, 180, 255, 0.5) 12px, transparent 12px) top left/1px 100% no-repeat,
+        linear-gradient(270deg, rgba(0, 180, 255, 0.5) 12px, transparent 12px) bottom right/100% 1px no-repeat,
+        linear-gradient(0deg, rgba(0, 180, 255, 0.5) 12px, transparent 12px) bottom right/1px 100% no-repeat;
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    /* ── Nav hint ── */
+    .nav-hint {
+      position: absolute;
+      bottom: 22px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.68rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      opacity: 0;
+      animation: fadeI 2s ease-out 2s both;
+    }
+
+    .nav-hint.her-hint {
+      color: rgba(255, 200, 225, 0.4);
+    }
+
+    .nav-hint.me-hint {
+      color: rgba(0, 180, 255, 0.35);
+    }
+
+    .arrow {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: 1px solid currentColor;
+      font-size: 0.7rem;
+      animation: arrowPulse 2s ease-in-out infinite;
+      cursor: pointer;
+      transition: opacity 0.3s;
+    }
+
+    .arrow:hover {
+      opacity: 0.9;
+    }
+
+    @keyframes arrowPulse {
+
+      0%,
+      100% {
+        opacity: 0.4;
+      }
+
+      50% {
+        opacity: 0.85;
+      }
+    }
+
+    /* ── Mobile ── */
+    @media(max-width:600px) {
+
+      .her-card,
+      .me-card {
+        padding: 24px 18px;
+        width: 86%;
+      }
+
+      .her-lotus {
+        width: 100px;
+        height: 100px;
+      }
+
+      .shield-wrap {
+        width: 60px;
+        height: 60px;
       }
     }
   </style>
 </head>
+
 <body>
+  <div id="viewport">
 
-<div id="scene">
-  <canvas id="canvas-bg"></canvas>
-  <canvas id="canvas-rain"></canvas>
-  <canvas id="bloom-canvas"></canvas>
-  <canvas id="canvas-rip"></canvas>
+    <!-- ══ HER PAGE ══ -->
+    <div class="page active" id="page-her">
+      <canvas id="her-bg"></canvas>
+      <canvas id="her-rain"></canvas>
+      <canvas id="her-petals"></canvas>
+      <canvas id="her-rip"></canvas>
 
-  <main class="display-card" id="card">
-    <!-- Lotus SVG (original) -->
-    <div class="lotus-container">
-      <svg class="svg-lotus" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id="petalGrad1" x1="0%" y1="100%" x2="0%" y2="0%">
-            <stop offset="0%" stop-color="#d85c89" />
-            <stop offset="100%" stop-color="#ffa6c9" />
-          </linearGradient>
-          <linearGradient id="petalGrad2" x1="0%" y1="100%" x2="0%" y2="0%">
-            <stop offset="0%" stop-color="#ff8aa4" />
-            <stop offset="100%" stop-color="#ffeef4" />
-          </linearGradient>
-          <linearGradient id="petalGrad3" x1="0%" y1="100%" x2="0%" y2="0%">
-            <stop offset="0%" stop-color="#f9c5d1" />
-            <stop offset="100%" stop-color="#ffffff" />
-          </linearGradient>
-        </defs>
-        <path d="M50,88 C25,70 8,50 50,12 C92,50 75,70 50,88 Z" fill="url(#petalGrad1)" opacity="0.7" />
-        <path d="M50,88 C12,78 -10,45 35,32 C45,50 50,88 50,88 Z" fill="url(#petalGrad2)" opacity="0.8" />
-        <path d="M50,88 C88,78 110,45 65,32 C55,50 50,88 50,88 Z" fill="url(#petalGrad2)" opacity="0.8" />
-        <path d="M50,88 C2,82 -2,55 40,45 C45,65 50,88 50,88 Z" fill="url(#petalGrad1)" opacity="0.85" />
-        <path d="M50,88 C98,82 102,55 60,45 C55,65 50,88 50,88 Z" fill="url(#petalGrad1)" opacity="0.85" />
-        <path d="M50,88 C22,90 15,65 45,58 C50,75 50,88 50,88 Z" fill="url(#petalGrad3)" opacity="0.95" />
-        <path d="M50,88 C78,90 85,65 55,58 C50,75 50,88 50,88 Z" fill="url(#petalGrad3)" opacity="0.95" />
-        <path d="M50,88 C35,90 28,85 50,68 C72,85 65,90 50,88 Z" fill="#ffffff" opacity="0.98" />
-      </svg>
+      <main class="her-card" id="her-card">
+        <div class="her-lotus">
+          <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="pg1" x1="0%" y1="100%" x2="0%" y2="0%">
+                <stop offset="0%" stop-color="#d85c89" />
+                <stop offset="100%" stop-color="#ffa6c9" />
+              </linearGradient>
+              <linearGradient id="pg2" x1="0%" y1="100%" x2="0%" y2="0%">
+                <stop offset="0%" stop-color="#ff8aa4" />
+                <stop offset="100%" stop-color="#ffeef4" />
+              </linearGradient>
+              <linearGradient id="pg3" x1="0%" y1="100%" x2="0%" y2="0%">
+                <stop offset="0%" stop-color="#f9c5d1" />
+                <stop offset="100%" stop-color="#ffffff" />
+              </linearGradient>
+            </defs>
+            <path d="M50,88 C25,70 8,50 50,12 C92,50 75,70 50,88 Z" fill="url(#pg1)" opacity="0.7" />
+            <path d="M50,88 C12,78 -10,45 35,32 C45,50 50,88 50,88 Z" fill="url(#pg2)" opacity="0.8" />
+            <path d="M50,88 C88,78 110,45 65,32 C55,50 50,88 50,88 Z" fill="url(#pg2)" opacity="0.8" />
+            <path d="M50,88 C2,82 -2,55 40,45 C45,65 50,88 50,88 Z" fill="url(#pg1)" opacity="0.85" />
+            <path d="M50,88 C98,82 102,55 60,45 C55,65 50,88 50,88 Z" fill="url(#pg1)" opacity="0.85" />
+            <path d="M50,88 C22,90 15,65 45,58 C50,75 50,88 50,88 Z" fill="url(#pg3)" opacity="0.95" />
+            <path d="M50,88 C78,90 85,65 55,58 C50,75 50,88 50,88 Z" fill="url(#pg3)" opacity="0.95" />
+            <path d="M50,88 C35,90 28,85 50,68 C72,85 65,90 50,88 Z" fill="#ffffff" opacity="0.98" />
+          </svg>
+        </div>
+        <h1 class="her-name">
+          <span class="letter" id="hl0">N</span><span class="letter" id="hl1">a</span><span class="letter"
+            id="hl2">v</span><span class="letter" id="hl3">o</span><span class="letter" id="hl4">d</span><span
+            class="letter" id="hl5">y</span><span class="letter" id="hl6">a</span>
+        </h1>
+        <div class="her-sub">Elegant Blossom</div>
+      </main>
+
+      <div class="nav-hint her-hint">
+        <span class="arrow" id="her-arrow-right" title="VinugaK →">›</span>
+        <span>swipe right</span>
+      </div>
     </div>
 
-    <!-- Name with drip spans -->
-    <h1 class="navodya" id="name-heading">
-      <span class="letter" id="l0">N</span><span class="letter" id="l1">a</span><span class="letter" id="l2">v</span><span class="letter" id="l3">o</span><span class="letter" id="l4">d</span><span class="letter" id="l5">y</span><span class="letter" id="l6">a</span>
-    </h1>
-    <div class="subtext">Elegant Blossom</div>
-  </main>
-</div>
+    <!-- ══ MY PAGE ══ -->
+    <div class="page" id="page-me">
+      <canvas id="me-bg"></canvas>
+      <canvas id="me-particles"></canvas>
 
-<footer class="aesthetic-footer">Aesthetic Renewal</footer>
+      <main class="me-card" id="me-card">
+        <div class="shield-wrap">
+          <svg class="shield-svg" viewBox="0 0 80 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="sg" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#00cfff" />
+                <stop offset="100%" stop-color="#0060a0" />
+              </linearGradient>
+              <filter id="glow">
+                <feGaussianBlur stdDeviation="2.5" result="blur" />
+                <feMerge>
+                  <feMergeNode in="blur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+            </defs>
+            <!-- Shield body -->
+            <path d="M40 4 L74 16 L74 44 C74 64 40 86 40 86 C40 86 6 64 6 44 L6 16 Z" fill="none" stroke="url(#sg)"
+              stroke-width="2.5" filter="url(#glow)" />
+            <!-- Inner shield -->
+            <path d="M40 14 L66 24 L66 44 C66 59 40 76 40 76 C40 76 14 59 14 44 L14 24 Z" fill="rgba(0,160,220,0.07)"
+              stroke="rgba(0,200,255,0.3)" stroke-width="1" />
+            <!-- Lock body -->
+            <rect x="31" y="44" width="18" height="14" rx="2" fill="rgba(0,180,255,0.7)" filter="url(#glow)" />
+            <!-- Lock shackle -->
+            <path d="M33 44 L33 38 C33 33 47 33 47 38 L47 44" stroke="rgba(0,200,255,0.9)" stroke-width="2.2"
+              fill="none" stroke-linecap="round" filter="url(#glow)" />
+            <!-- Keyhole -->
+            <circle cx="40" cy="50" r="2.5" fill="#010a14" />
+            <rect x="39" y="51" width="2" height="4" rx="1" fill="#010a14" />
+          </svg>
+        </div>
 
-<script>
-  // ── Dimensions ──
-  let W = window.innerWidth, H = window.innerHeight;
-  const isMobile = () => window.innerWidth < 600;
-  const POND_RATIO = 0.56;
-  let POND_Y = H * POND_RATIO;
+        <h1 class="me-name" id="me-name">VinugaK</h1>
+        <div class="me-tagline">// Secure the system. Master the craft.</div>
+        <div class="me-roles">
+          <span>Cybersecurity Student</span>
+          <span>Ethical Hacker</span>
+          <span>Just a chill guy</span>
+        </div>
+      </main>
 
-  function resizeCanvas(id) {
-    const c = document.getElementById(id);
-    c.width = W; c.height = H;
-    return c.getContext('2d');
-  }
+      <div class="nav-hint me-hint">
+        <span>swipe left</span>
+        <span class="arrow" id="me-arrow-left" title="← Navodya">‹</span>
+      </div>
+    </div>
 
-  let bgCtx   = resizeCanvas('canvas-bg');
-  let rainCtx = resizeCanvas('canvas-rain');
-  let ripCtx  = resizeCanvas('canvas-rip');
-  let pelCtx  = resizeCanvas('bloom-canvas');
+  </div><!-- /viewport -->
 
-  // ── Stars ──
-  let stars = [];
-  function initStars() {
-    const count = isMobile() ? 55 : 100;
-    stars = Array.from({ length: count }, () => ({
-      x: Math.random() * W,
-      y: Math.random() * POND_Y * 0.52,
-      r: 0.4 + Math.random() * 1.4,
-      a: 0.35 + Math.random() * 0.65,
-      t: Math.random() * Math.PI * 2,
-      ts: 0.018 + Math.random() * 0.025,
-    }));
-  }
+  <script>
+    // ══════════════════════════════════════════
+    //  SHARED UTILS
+    // ══════════════════════════════════════════
+    let W = window.innerWidth, H = window.innerHeight;
+    const isMobile = () => W < 600;
+    let currentPage = 0; // 0 = her, 1 = me
+    let transitioning = false;
 
-  // ── Lotus draw ──
-  function drawLotus(ctx, x, y, size) {
-    ctx.save(); ctx.translate(x, y);
-    ctx.fillStyle = '#1e5228';
-    ctx.beginPath();
-    ctx.ellipse(0, size * 0.55, size * 1.05, size * 0.3, 0, 0, Math.PI * 2);
-    ctx.fill();
-    for (let i = 0; i < 8; i++) {
-      const a = (i / 8) * Math.PI * 2 - Math.PI / 2;
-      ctx.save(); ctx.rotate(a);
-      const pg = ctx.createLinearGradient(0, 0, 0, -size);
-      pg.addColorStop(0, '#d45582'); pg.addColorStop(0.5, '#ef8aac'); pg.addColorStop(1, '#ffd3e8');
-      ctx.fillStyle = pg;
-      ctx.beginPath();
-      ctx.moveTo(0, 0);
-      ctx.bezierCurveTo(-size*0.23, -size*0.27, -size*0.13, -size*0.87, 0, -size*0.92);
-      ctx.bezierCurveTo( size*0.13, -size*0.87,  size*0.23, -size*0.27, 0, 0);
-      ctx.fill(); ctx.restore();
+    function resizeCanvas(id) { const c = document.getElementById(id); c.width = W; c.height = H; return c.getContext('2d'); }
+
+    // ══════════════════════════════════════════
+    //  PAGE TRANSITION
+    // ══════════════════════════════════════════
+    const pages = [document.getElementById('page-her'), document.getElementById('page-me')];
+
+    function goTo(idx) {
+      if (idx === currentPage || transitioning) return;
+      transitioning = true;
+      const from = pages[currentPage], to = pages[idx];
+      to.style.opacity = '0'; to.style.pointerEvents = 'none'; to.classList.add('active');
+      // dissolve
+      requestAnimationFrame(() => {
+        from.style.opacity = '0';
+        to.style.opacity = '1';
+        to.style.pointerEvents = 'all';
+        setTimeout(() => {
+          from.classList.remove('active');
+          from.style.opacity = '';
+          from.style.pointerEvents = '';
+          currentPage = idx;
+          transitioning = false;
+        }, 1150);
+      });
     }
-    for (let i = 0; i < 6; i++) {
-      const a = (i / 6) * Math.PI * 2;
-      ctx.save(); ctx.rotate(a); ctx.globalAlpha = 0.88;
-      const pg2 = ctx.createLinearGradient(0, 0, 0, -size * 0.77);
-      pg2.addColorStop(0, '#ff86ab'); pg2.addColorStop(1, '#ffdcef');
-      ctx.fillStyle = pg2;
-      ctx.beginPath();
-      ctx.moveTo(0, 0);
-      ctx.bezierCurveTo(-size*0.17, -size*0.22, -size*0.1, -size*0.67, 0, -size*0.72);
-      ctx.bezierCurveTo( size*0.1,  -size*0.67,  size*0.17, -size*0.22, 0, 0);
-      ctx.fill(); ctx.restore();
-    }
-    const cg = ctx.createRadialGradient(0, -size*0.08, 0, 0, -size*0.08, size*0.2);
-    cg.addColorStop(0, '#fff099'); cg.addColorStop(0.5, '#f8c455'); cg.addColorStop(1, '#e79060');
-    ctx.fillStyle = cg;
-    ctx.beginPath();
-    ctx.ellipse(0, -size*0.08, size*0.2, size*0.16, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-  }
 
-  // ── Lotus positions ──
-  let LOTUSES = [];
-  function initLotuses() {
-    const m = isMobile();
-    LOTUSES = m ? [
-      { x: W*0.06, y: POND_Y+28,  s: 17 },
-      { x: W*0.18, y: POND_Y+58,  s: 21 },
-      { x: W*0.05, y: POND_Y+98,  s: 13 },
-      { x: W*0.88, y: POND_Y+32,  s: 19 },
-      { x: W*0.95, y: POND_Y+76,  s: 15 },
-      { x: W*0.82, y: POND_Y+112, s: 21 },
-      { x: W*0.23, y: POND_Y+108, s: 13 },
-      { x: W*0.77, y: POND_Y+98,  s: 16 },
-      { x: W*0.10, y: POND_Y+148, s: 11 },
-      { x: W*0.91, y: POND_Y+152, s: 12 },
-    ] : [
-      { x: W*0.07, y: POND_Y+40,  s: 28 },
-      { x: W*0.18, y: POND_Y+72,  s: 35 },
-      { x: W*0.05, y: POND_Y+112, s: 22 },
-      { x: W*0.82, y: POND_Y+52,  s: 30 },
-      { x: W*0.92, y: POND_Y+92,  s: 25 },
-      { x: W*0.88, y: POND_Y+142, s: 32 },
-      { x: W*0.25, y: POND_Y+132, s: 20 },
-      { x: W*0.75, y: POND_Y+122, s: 24 },
-      { x: W*0.12, y: POND_Y+172, s: 18 },
-      { x: W*0.90, y: POND_Y+202, s: 20 },
-      { x: W*0.03, y: POND_Y+202, s: 15 },
-    ];
-  }
+    // Arrow clicks
+    document.getElementById('her-arrow-right').addEventListener('click', () => goTo(1));
+    document.getElementById('me-arrow-left').addEventListener('click', () => goTo(0));
 
-  // ── Draw background ──
-  function drawBackground() {
-    bgCtx.clearRect(0, 0, W, H);
-
-    // Sky
-    const sky = bgCtx.createLinearGradient(0, 0, 0, POND_Y);
-    sky.addColorStop(0,    '#120218');
-    sky.addColorStop(0.18, '#3c0b36');
-    sky.addColorStop(0.42, '#bc4370');
-    sky.addColorStop(0.62, '#de7b60');
-    sky.addColorStop(0.82, '#f3b172');
-    sky.addColorStop(1,    '#fcd898');
-    bgCtx.fillStyle = sky;
-    bgCtx.fillRect(0, 0, W, POND_Y);
-
-    // Stars
-    stars.forEach(s => {
-      s.t += s.ts;
-      const alpha = s.a * (0.55 + 0.45 * Math.sin(s.t));
-      bgCtx.save();
-      bgCtx.globalAlpha = alpha;
-      bgCtx.fillStyle = '#fff';
-      bgCtx.beginPath();
-      bgCtx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-      bgCtx.fill();
-      bgCtx.restore();
+    // Keyboard
+    window.addEventListener('keydown', e => {
+      if (e.key === 'ArrowRight') goTo(1);
+      if (e.key === 'ArrowLeft') goTo(0);
     });
 
-    // Clouds
-    const clouds = [
-      { x:W*0.13, y:H*0.055, rx:W*0.14, ry:H*0.038, c:'rgba(200,75,125,0.42)' },
-      { x:W*0.58, y:H*0.040, rx:W*0.18, ry:H*0.032, c:'rgba(215,95,90,0.36)' },
-      { x:W*0.86, y:H*0.085, rx:W*0.13, ry:H*0.028, c:'rgba(185,60,115,0.40)' },
-      { x:W*0.40, y:H*0.120, rx:W*0.20, ry:H*0.038, c:'rgba(225,115,82,0.26)' },
-      { x:W*0.72, y:H*0.140, rx:W*0.16, ry:H*0.030, c:'rgba(200,80,105,0.30)' },
-    ];
-    clouds.forEach(cl => {
-      const g = bgCtx.createRadialGradient(cl.x, cl.y, 0, cl.x, cl.y, Math.max(cl.rx, cl.ry));
-      g.addColorStop(0, cl.c); g.addColorStop(1, 'transparent');
-      bgCtx.save(); bgCtx.fillStyle = g;
-      bgCtx.beginPath(); bgCtx.ellipse(cl.x, cl.y, cl.rx, cl.ry, 0, 0, Math.PI * 2);
-      bgCtx.fill(); bgCtx.restore();
-    });
+    // Touch swipe
+    let touchStartX = 0;
+    window.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
+    window.addEventListener('touchend', e => {
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      if (Math.abs(dx) > 60) { dx < 0 ? goTo(1) : goTo(0); }
+    }, { passive: true });
 
-    // Hill silhouette
-    bgCtx.save(); bgCtx.fillStyle = '#1c0518';
-    bgCtx.beginPath(); bgCtx.moveTo(0, POND_Y);
-    for (let x = 0; x <= W; x += 28) {
-      const y = POND_Y - 20 - Math.sin(x * 0.017) * 18 - Math.sin(x * 0.048) * 8;
-      bgCtx.lineTo(x, y);
+    // ══════════════════════════════════════════
+    //  HER SCENE
+    // ══════════════════════════════════════════
+    const POND_RATIO = 0.56;
+    let POND_Y = H * POND_RATIO;
+    let herBgCtx, herRainCtx, herRipCtx, herPelCtx;
+    let herStars = [], herDrops = [], herRipples = [], herPetals = [];
+    let herRipTimer = 0;
+
+    function initHer() {
+      herBgCtx = resizeCanvas('her-bg');
+      herRainCtx = resizeCanvas('her-rain');
+      herRipCtx = resizeCanvas('her-rip');
+      herPelCtx = resizeCanvas('her-petals');
+      POND_Y = H * POND_RATIO;
+      initHerStars(); initHerLotuses(); initHerRain(); initHerPetals();
     }
-    bgCtx.lineTo(W, POND_Y); bgCtx.closePath(); bgCtx.fill(); bgCtx.restore();
 
-    // Pond
-    const pond = bgCtx.createLinearGradient(0, POND_Y, 0, H);
-    pond.addColorStop(0,    '#bc4e72');
-    pond.addColorStop(0.15, '#982d58');
-    pond.addColorStop(0.45, '#731840');
-    pond.addColorStop(0.75, '#480a28');
-    pond.addColorStop(1,    '#1b0514');
-    bgCtx.fillStyle = pond;
-    bgCtx.fillRect(0, POND_Y, W, H - POND_Y);
-
-    // Shimmer
-    bgCtx.save(); bgCtx.globalAlpha = 0.14;
-    for (let i = 0; i < 7; i++) {
-      const rx = W * (0.28 + i * 0.075);
-      const rw = 8 + i * 3.5, rh = 52 + i * 14;
-      const rg = bgCtx.createLinearGradient(rx, POND_Y, rx, POND_Y + rh);
-      rg.addColorStop(0, '#ffc0a0'); rg.addColorStop(1, 'transparent');
-      bgCtx.fillStyle = rg; bgCtx.fillRect(rx - rw/2, POND_Y, rw, rh);
+    function initHerStars() {
+      herStars = Array.from({ length: isMobile() ? 50 : 95 }, () => ({
+        x: Math.random() * W, y: Math.random() * POND_Y * 0.52,
+        r: 0.4 + Math.random() * 1.3, a: 0.35 + Math.random() * 0.6,
+        t: Math.random() * Math.PI * 2, ts: 0.018 + Math.random() * 0.024,
+      }));
     }
-    bgCtx.restore();
 
-    // Water edge
-    bgCtx.save(); bgCtx.strokeStyle = 'rgba(255,175,135,0.28)'; bgCtx.lineWidth = 1.5;
-    bgCtx.beginPath(); bgCtx.moveTo(0, POND_Y); bgCtx.lineTo(W, POND_Y); bgCtx.stroke(); bgCtx.restore();
-
-    // Lotuses
-    LOTUSES.forEach(l => drawLotus(bgCtx, l.x, l.y, l.s));
-  }
-
-  // ── Rain ──
-  let drops = [];
-  function initRain() {
-    const count = isMobile() ? 130 : 210;
-    drops = Array.from({ length: count }, () => ({
-      x: Math.random() * W,
-      y: Math.random() * H,
-      len: (isMobile() ? 7 : 11) + Math.random() * 13,
-      speed: 7 + Math.random() * 7,
-      alpha: 0.22 + Math.random() * 0.42,
-      thick: 0.4 + Math.random() * 0.85,
-    }));
-  }
-
-  function drawRain() {
-    rainCtx.clearRect(0, 0, W, H);
-    drops.forEach(d => {
-      d.y += d.speed; d.x -= d.speed * 0.1;
-      if (d.y > H + d.len) { d.y = -d.len; d.x = Math.random() * W; }
-      rainCtx.beginPath();
-      rainCtx.strokeStyle = `rgba(255,212,240,${d.alpha})`;
-      rainCtx.lineWidth = d.thick;
-      rainCtx.moveTo(d.x, d.y);
-      rainCtx.lineTo(d.x - d.len * 0.1, d.y + d.len);
-      rainCtx.stroke();
-    });
-  }
-
-  // ── Ripples ──
-  let ripples = [], ripTimer = 0;
-  function spawnRipple(x, y) {
-    ripples.push({ x, y, r: 0, maxR: (isMobile() ? 18 : 28) + Math.random() * 22, alpha: 0.6, spd: 0.4 + Math.random() * 0.4 });
-  }
-  function drawRipples() {
-    ripTimer++;
-    if (ripTimer % 4 === 0) spawnRipple(Math.random() * W, POND_Y + Math.random() * (H - POND_Y));
-    ripCtx.clearRect(0, 0, W, H);
-    for (let i = ripples.length - 1; i >= 0; i--) {
-      const rp = ripples[i];
-      rp.r += rp.spd; rp.alpha -= 0.013;
-      if (rp.alpha <= 0 || rp.r > rp.maxR) { ripples.splice(i, 1); continue; }
-      ripCtx.save();
-      ripCtx.strokeStyle = `rgba(255,185,220,${rp.alpha})`;
-      ripCtx.lineWidth = 1;
-      ripCtx.beginPath();
-      ripCtx.ellipse(rp.x, rp.y, rp.r, rp.r * 0.32, 0, 0, Math.PI * 2);
-      ripCtx.stroke(); ripCtx.restore();
+    let LOTUSES = [];
+    function initHerLotuses() {
+      LOTUSES = isMobile() ? [
+        { x: W * 0.06, y: POND_Y + 28, s: 16 }, { x: W * 0.18, y: POND_Y + 56, s: 20 },
+        { x: W * 0.05, y: POND_Y + 96, s: 12 }, { x: W * 0.88, y: POND_Y + 32, s: 18 },
+        { x: W * 0.95, y: POND_Y + 74, s: 14 }, { x: W * 0.82, y: POND_Y + 110, s: 20 },
+        { x: W * 0.23, y: POND_Y + 105, s: 12 }, { x: W * 0.77, y: POND_Y + 96, s: 15 },
+        { x: W * 0.10, y: POND_Y + 145, s: 10 }, { x: W * 0.91, y: POND_Y + 150, s: 11 },
+      ] : [
+        { x: W * 0.07, y: POND_Y + 40, s: 28 }, { x: W * 0.18, y: POND_Y + 72, s: 35 },
+        { x: W * 0.05, y: POND_Y + 112, s: 22 }, { x: W * 0.82, y: POND_Y + 52, s: 30 },
+        { x: W * 0.92, y: POND_Y + 92, s: 25 }, { x: W * 0.88, y: POND_Y + 142, s: 32 },
+        { x: W * 0.25, y: POND_Y + 132, s: 20 }, { x: W * 0.75, y: POND_Y + 122, s: 24 },
+        { x: W * 0.12, y: POND_Y + 172, s: 18 }, { x: W * 0.90, y: POND_Y + 202, s: 20 },
+        { x: W * 0.03, y: POND_Y + 202, s: 15 },
+      ];
     }
-  }
 
-  // ── Letter drips ──
-  const LETTERS = ['l0','l1','l2','l3','l4','l5','l6'];
-  const letterDrips = LETTERS.map(() => ({ drops: [], timer: Math.floor(Math.random() * 50) }));
-
-  function animateDrips() {
-    LETTERS.forEach((id, i) => {
-      const ld = letterDrips[i];
-      ld.timer--;
-      if (ld.timer <= 0) {
-        ld.drops.push({
-          len: 0,
-          speed: 0.65 + Math.random() * 1.1,
-          maxLen: (isMobile() ? 14 : 20) + Math.random() * 35,
-          leftPct: 22 + Math.random() * 56,
-        });
-        ld.timer = 28 + Math.floor(Math.random() * 55);
+    function drawHerLotus(ctx, x, y, size) {
+      ctx.save(); ctx.translate(x, y);
+      ctx.fillStyle = '#1e5228';
+      ctx.beginPath(); ctx.ellipse(0, size * 0.55, size * 1.05, size * 0.3, 0, 0, Math.PI * 2); ctx.fill();
+      for (let i = 0; i < 8; i++) {
+        const a = (i / 8) * Math.PI * 2 - Math.PI / 2;
+        ctx.save(); ctx.rotate(a);
+        const pg = ctx.createLinearGradient(0, 0, 0, -size);
+        pg.addColorStop(0, '#d45582'); pg.addColorStop(0.5, '#ef8aac'); pg.addColorStop(1, '#ffd3e8');
+        ctx.fillStyle = pg; ctx.beginPath(); ctx.moveTo(0, 0);
+        ctx.bezierCurveTo(-size * 0.23, -size * 0.27, -size * 0.13, -size * 0.87, 0, -size * 0.92);
+        ctx.bezierCurveTo(size * 0.13, -size * 0.87, size * 0.23, -size * 0.27, 0, 0);
+        ctx.fill(); ctx.restore();
       }
-      const el = document.getElementById(id);
-      if (!el) return;
-      el.querySelectorAll('.drip').forEach(d => d.remove());
-      for (let j = ld.drops.length - 1; j >= 0; j--) {
-        const dr = ld.drops[j];
-        dr.len += dr.speed;
-        if (dr.len > dr.maxLen) {
-          ld.drops.splice(j, 1);
-          const rect = el.getBoundingClientRect();
-          spawnRipple(rect.left + rect.width * (dr.leftPct / 100), POND_Y + 8 + Math.random() * 22);
-          continue;
+      for (let i = 0; i < 6; i++) {
+        const a = (i / 6) * Math.PI * 2;
+        ctx.save(); ctx.rotate(a); ctx.globalAlpha = 0.88;
+        const pg2 = ctx.createLinearGradient(0, 0, 0, -size * 0.77);
+        pg2.addColorStop(0, '#ff86ab'); pg2.addColorStop(1, '#ffdcef');
+        ctx.fillStyle = pg2; ctx.beginPath(); ctx.moveTo(0, 0);
+        ctx.bezierCurveTo(-size * 0.17, -size * 0.22, -size * 0.1, -size * 0.67, 0, -size * 0.72);
+        ctx.bezierCurveTo(size * 0.1, -size * 0.67, size * 0.17, -size * 0.22, 0, 0);
+        ctx.fill(); ctx.restore();
+      }
+      const cg = ctx.createRadialGradient(0, -size * 0.08, 0, 0, -size * 0.08, size * 0.2);
+      cg.addColorStop(0, '#fff099'); cg.addColorStop(0.5, '#f8c455'); cg.addColorStop(1, '#e79060');
+      ctx.fillStyle = cg; ctx.beginPath(); ctx.ellipse(0, -size * 0.08, size * 0.2, size * 0.16, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+    }
+
+    function drawHerBg() {
+      herBgCtx.clearRect(0, 0, W, H);
+      const sky = herBgCtx.createLinearGradient(0, 0, 0, POND_Y);
+      sky.addColorStop(0, '#120218'); sky.addColorStop(0.18, '#3c0b36');
+      sky.addColorStop(0.42, '#bc4370'); sky.addColorStop(0.62, '#de7b60');
+      sky.addColorStop(0.82, '#f3b172'); sky.addColorStop(1, '#fcd898');
+      herBgCtx.fillStyle = sky; herBgCtx.fillRect(0, 0, W, POND_Y);
+      herStars.forEach(s => {
+        s.t += s.ts;
+        const al = s.a * (0.55 + 0.45 * Math.sin(s.t));
+        herBgCtx.save(); herBgCtx.globalAlpha = al; herBgCtx.fillStyle = '#fff';
+        herBgCtx.beginPath(); herBgCtx.arc(s.x, s.y, s.r, 0, Math.PI * 2); herBgCtx.fill(); herBgCtx.restore();
+      });
+      const clouds = [
+        { x: W * 0.13, y: H * 0.055, rx: W * 0.14, ry: H * 0.038, c: 'rgba(200,75,125,0.42)' },
+        { x: W * 0.58, y: H * 0.040, rx: W * 0.18, ry: H * 0.032, c: 'rgba(215,95,90,0.36)' },
+        { x: W * 0.86, y: H * 0.085, rx: W * 0.13, ry: H * 0.028, c: 'rgba(185,60,115,0.40)' },
+        { x: W * 0.40, y: H * 0.120, rx: W * 0.20, ry: H * 0.038, c: 'rgba(225,115,82,0.26)' },
+      ];
+      clouds.forEach(cl => {
+        const g = herBgCtx.createRadialGradient(cl.x, cl.y, 0, cl.x, cl.y, Math.max(cl.rx, cl.ry));
+        g.addColorStop(0, cl.c); g.addColorStop(1, 'transparent');
+        herBgCtx.save(); herBgCtx.fillStyle = g;
+        herBgCtx.beginPath(); herBgCtx.ellipse(cl.x, cl.y, cl.rx, cl.ry, 0, 0, Math.PI * 2);
+        herBgCtx.fill(); herBgCtx.restore();
+      });
+      herBgCtx.save(); herBgCtx.fillStyle = '#1c0518';
+      herBgCtx.beginPath(); herBgCtx.moveTo(0, POND_Y);
+      for (let x = 0; x <= W; x += 28) { const y = POND_Y - 20 - Math.sin(x * 0.017) * 18 - Math.sin(x * 0.048) * 8; herBgCtx.lineTo(x, y); }
+      herBgCtx.lineTo(W, POND_Y); herBgCtx.closePath(); herBgCtx.fill(); herBgCtx.restore();
+      const pond = herBgCtx.createLinearGradient(0, POND_Y, 0, H);
+      pond.addColorStop(0, '#bc4e72'); pond.addColorStop(0.15, '#982d58');
+      pond.addColorStop(0.45, '#731840'); pond.addColorStop(0.75, '#480a28'); pond.addColorStop(1, '#1b0514');
+      herBgCtx.fillStyle = pond; herBgCtx.fillRect(0, POND_Y, W, H - POND_Y);
+      herBgCtx.save(); herBgCtx.globalAlpha = 0.13;
+      for (let i = 0; i < 6; i++) {
+        const rx = W * (0.28 + i * 0.08), rw = 8 + i * 3.5, rh = 52 + i * 14;
+        const rg = herBgCtx.createLinearGradient(rx, POND_Y, rx, POND_Y + rh);
+        rg.addColorStop(0, '#ffc0a0'); rg.addColorStop(1, 'transparent');
+        herBgCtx.fillStyle = rg; herBgCtx.fillRect(rx - rw / 2, POND_Y, rw, rh);
+      }
+      herBgCtx.restore();
+      herBgCtx.save(); herBgCtx.strokeStyle = 'rgba(255,175,135,0.26)'; herBgCtx.lineWidth = 1.5;
+      herBgCtx.beginPath(); herBgCtx.moveTo(0, POND_Y); herBgCtx.lineTo(W, POND_Y); herBgCtx.stroke(); herBgCtx.restore();
+      LOTUSES.forEach(l => drawHerLotus(herBgCtx, l.x, l.y, l.s));
+    }
+
+    function initHerRain() {
+      const count = isMobile() ? 120 : 200;
+      herDrops = Array.from({ length: count }, () => ({
+        x: Math.random() * W, y: Math.random() * H,
+        len: (isMobile() ? 7 : 11) + Math.random() * 13,
+        speed: 7 + Math.random() * 7,
+        alpha: 0.2 + Math.random() * 0.4,
+        thick: 0.4 + Math.random() * 0.8,
+      }));
+    }
+    function drawHerRain() {
+      herRainCtx.clearRect(0, 0, W, H);
+      herDrops.forEach(d => {
+        d.y += d.speed; d.x -= d.speed * 0.1;
+        if (d.y > H + d.len) { d.y = -d.len; d.x = Math.random() * W; }
+        herRainCtx.beginPath();
+        herRainCtx.strokeStyle = `rgba(255,212,240,${d.alpha})`;
+        herRainCtx.lineWidth = d.thick;
+        herRainCtx.moveTo(d.x, d.y); herRainCtx.lineTo(d.x - d.len * 0.1, d.y + d.len);
+        herRainCtx.stroke();
+      });
+    }
+
+    function spawnHerRipple(x, y) { herRipples.push({ x, y, r: 0, maxR: (isMobile() ? 16 : 26) + Math.random() * 20, alpha: 0.6, spd: 0.4 + Math.random() * 0.4 }); }
+    function drawHerRipples() {
+      herRipTimer++;
+      if (herRipTimer % 4 === 0) spawnHerRipple(Math.random() * W, POND_Y + Math.random() * (H - POND_Y));
+      herRipCtx.clearRect(0, 0, W, H);
+      for (let i = herRipples.length - 1; i >= 0; i--) {
+        const rp = herRipples[i]; rp.r += rp.spd; rp.alpha -= 0.013;
+        if (rp.alpha <= 0 || rp.r > rp.maxR) { herRipples.splice(i, 1); continue; }
+        herRipCtx.save(); herRipCtx.strokeStyle = `rgba(255,185,220,${rp.alpha})`; herRipCtx.lineWidth = 1;
+        herRipCtx.beginPath(); herRipCtx.ellipse(rp.x, rp.y, rp.r, rp.r * 0.32, 0, 0, Math.PI * 2);
+        herRipCtx.stroke(); herRipCtx.restore();
+      }
+    }
+
+    const HER_LETTERS = ['hl0', 'hl1', 'hl2', 'hl3', 'hl4', 'hl5', 'hl6'];
+    const herLetterDrips = HER_LETTERS.map(() => ({ drops: [], timer: Math.floor(Math.random() * 50) }));
+    function animateHerDrips() {
+      HER_LETTERS.forEach((id, i) => {
+        const ld = herLetterDrips[i]; ld.timer--;
+        if (ld.timer <= 0) {
+          ld.drops.push({ len: 0, speed: 0.65 + Math.random() * 1.1, maxLen: (isMobile() ? 12 : 18) + Math.random() * 32, leftPct: 22 + Math.random() * 56 });
+          ld.timer = 28 + Math.floor(Math.random() * 55);
         }
-        const dEl = document.createElement('div');
-        dEl.className = 'drip';
-        dEl.style.height = dr.len + 'px';
-        dEl.style.left = dr.leftPct + '%';
-        dEl.style.opacity = String(0.9 - (dr.len / dr.maxLen) * 0.3);
-        el.appendChild(dEl);
-      }
+        const el = document.getElementById(id); if (!el) return;
+        el.querySelectorAll('.drip').forEach(d => d.remove());
+        for (let j = ld.drops.length - 1; j >= 0; j--) {
+          const dr = ld.drops[j]; dr.len += dr.speed;
+          if (dr.len > dr.maxLen) {
+            ld.drops.splice(j, 1);
+            const rect = el.getBoundingClientRect();
+            spawnHerRipple(rect.left + rect.width * (dr.leftPct / 100), POND_Y + 8 + Math.random() * 20);
+            continue;
+          }
+          const dEl = document.createElement('div'); dEl.className = 'drip';
+          dEl.style.height = dr.len + 'px'; dEl.style.left = dr.leftPct + '%';
+          dEl.style.opacity = String(0.9 - dr.len / dr.maxLen * 0.3);
+          el.appendChild(dEl);
+        }
+      });
+    }
+
+    function initHerPetals() {
+      const count = Math.min(isMobile() ? 24 : 45, Math.floor((W * H) / 20000));
+      herPetals = Array.from({ length: count }, () => {
+        const p = {
+          reset() {
+            this.x = Math.random() * W; this.y = -20 - Math.random() * 50;
+            this.size = Math.random() * 8 + 5; this.speedY = Math.random() * 0.65 + 0.32;
+            this.speedX = Math.random() * 0.4 - 0.2; this.angle = Math.random() * Math.PI * 2;
+            this.angleSpeed = (Math.random() - 0.5) * 0.013;
+            const hues = [340, 350, 0, 15];
+            this.color = `hsla(${hues[Math.floor(Math.random() * hues.length)]},88%,84%,${Math.random() * 0.26 + 0.32})`;
+            this.osc = Math.random() * 1.3; this.oscSpd = Math.random() * 0.01 + 0.004; this.t = Math.random() * 100;
+          }
+        };
+        p.reset(); p.y = Math.random() * H; return p;
+      });
+    }
+    function drawHerPetals() {
+      herPelCtx.clearRect(0, 0, W, H);
+      herPetals.forEach(p => {
+        p.t += p.oscSpd; p.y += p.speedY; p.x += p.speedX + Math.sin(p.t) * p.osc; p.angle += p.angleSpeed;
+        if (p.y > H + 20) p.reset(); if (p.x > W + 20) p.x = -20; if (p.x < -20) p.x = W + 20;
+        herPelCtx.save(); herPelCtx.translate(p.x, p.y); herPelCtx.rotate(p.angle);
+        herPelCtx.beginPath(); herPelCtx.moveTo(0, 0);
+        herPelCtx.bezierCurveTo(p.size / 2, -p.size / 2, p.size, -p.size / 4, p.size, 0);
+        herPelCtx.bezierCurveTo(p.size, p.size / 4, p.size / 2, p.size / 2, 0, 0);
+        herPelCtx.fillStyle = p.color; herPelCtx.fill(); herPelCtx.restore();
+      });
+    }
+
+    // Her 3D tilt
+    document.addEventListener('mousemove', e => {
+      if (currentPage !== 0) return;
+      const cx = W / 2, cy = H / 2;
+      const tX = ((e.clientY - cy) / cy) * -7, tY = ((e.clientX - cx) / cx) * 7;
+      document.getElementById('her-card').style.transform = `translate(-50%,-50%) perspective(1000px) rotateX(${tX}deg) rotateY(${tY}deg)`;
     });
-  }
 
-  // ── Floating petals (original) ──
-  class Petal {
-    constructor() { this.reset(); this.y = Math.random() * H; }
-    reset() {
-      this.x = Math.random() * W;
-      this.y = -20 - Math.random() * 50;
-      this.size = Math.random() * 9 + 5;
-      this.speedY = Math.random() * 0.7 + 0.35;
-      this.speedX = Math.random() * 0.4 - 0.2;
-      this.angle = Math.random() * Math.PI * 2;
-      this.angleSpeed = (Math.random() - 0.5) * 0.014;
-      const hues = [340, 350, 0, 15];
-      this.color = `hsla(${hues[Math.floor(Math.random()*hues.length)]},88%,84%,${Math.random()*0.28+0.35})`;
-      this.osc = Math.random() * 1.4;
-      this.oscSpd = Math.random() * 0.01 + 0.004;
-      this.t = Math.random() * 100;
+    // ══════════════════════════════════════════
+    //  MY SCENE — Cyberpunk
+    // ══════════════════════════════════════════
+    let meBgCtx, meParCtx;
+    let meParticles = [], meCodeStreams = [], meGrid = [];
+
+    function initMe() {
+      meBgCtx = resizeCanvas('me-bg');
+      meParCtx = resizeCanvas('me-particles');
+      initMeGrid(); initMeParticles(); initMeCodeStreams();
     }
-    draw() {
-      pelCtx.save(); pelCtx.translate(this.x, this.y); pelCtx.rotate(this.angle);
-      pelCtx.beginPath(); pelCtx.moveTo(0, 0);
-      pelCtx.bezierCurveTo(this.size/2,-this.size/2,this.size,-this.size/4,this.size,0);
-      pelCtx.bezierCurveTo(this.size,this.size/4,this.size/2,this.size/2,0,0);
-      pelCtx.fillStyle = this.color;
-      pelCtx.fill(); pelCtx.restore();
+
+    function initMeGrid() {
+      meGrid = [];
+      const step = isMobile() ? 55 : 70;
+      for (let x = 0; x < W; x += step) for (let y = 0; y < H; y += step)
+        if (Math.random() > 0.65) meGrid.push({ x, y, a: Math.random() * 0.12 + 0.02, t: Math.random() * Math.PI * 2, ts: 0.005 + Math.random() * 0.01 });
     }
-    update(mx, my) {
-      this.t += this.oscSpd;
-      this.y += this.speedY;
-      this.x += this.speedX + Math.sin(this.t) * this.osc;
-      this.angle += this.angleSpeed;
-      const dx = this.x - mx, dy = this.y - my;
-      const dist = Math.sqrt(dx*dx+dy*dy);
-      if (dist < 180) {
-        const f = (180 - dist) / 180;
-        this.x += (dx/dist)*f*2.4;
-        this.y += (dy/dist)*f*1.4;
-      }
-      if (this.y > H+20) this.reset();
-      if (this.x > W+20) this.x = -20;
-      if (this.x < -20) this.x = W+20;
+
+    function drawMeBg() {
+      meBgCtx.clearRect(0, 0, W, H);
+      // Deep space bg
+      const bg = meBgCtx.createRadialGradient(W * 0.5, H * 0.4, 0, W * 0.5, H * 0.4, W * 0.85);
+      bg.addColorStop(0, '#011828'); bg.addColorStop(0.5, '#010e1a'); bg.addColorStop(1, '#010a14');
+      meBgCtx.fillStyle = bg; meBgCtx.fillRect(0, 0, W, H);
+
+      // Grid nodes
+      meGrid.forEach(g => {
+        g.t += g.ts;
+        const al = g.a * (0.5 + 0.5 * Math.sin(g.t));
+        meBgCtx.save(); meBgCtx.globalAlpha = al;
+        meBgCtx.fillStyle = '#00b4ff';
+        meBgCtx.beginPath(); meBgCtx.arc(g.x, g.y, 1, 0, Math.PI * 2); meBgCtx.fill();
+        meBgCtx.restore();
+      });
+
+      // Subtle hex grid lines
+      meBgCtx.save(); meBgCtx.strokeStyle = 'rgba(0,100,180,0.06)'; meBgCtx.lineWidth = 1;
+      const step = isMobile() ? 55 : 70;
+      for (let x = 0; x < W; x += step) { meBgCtx.beginPath(); meBgCtx.moveTo(x, 0); meBgCtx.lineTo(x, H); meBgCtx.stroke(); }
+      for (let y = 0; y < H; y += step) { meBgCtx.beginPath(); meBgCtx.moveTo(0, y); meBgCtx.lineTo(W, y); meBgCtx.stroke(); }
+      meBgCtx.restore();
+
+      // Blue glow orbs
+      [[W * 0.2, H * 0.3, 200, 'rgba(0,140,255,0.06)'], [W * 0.8, H * 0.7, 180, 'rgba(0,100,220,0.05)'], [W * 0.5, H * 0.5, 280, 'rgba(0,80,180,0.04)']].forEach(([x, y, r, c]) => {
+        const g = meBgCtx.createRadialGradient(x, y, 0, x, y, r);
+        g.addColorStop(0, c); g.addColorStop(1, 'transparent');
+        meBgCtx.fillStyle = g; meBgCtx.fillRect(0, 0, W, H);
+      });
     }
-  }
 
-  let petals = [];
-  function initPetals() {
-    const count = Math.min(isMobile() ? 28 : 50, Math.floor((W * H) / 20000));
-    petals = Array.from({ length: count }, () => new Petal());
-  }
+    // Floating particles
+    function initMeParticles() {
+      const count = isMobile() ? 40 : 80;
+      meParticles = Array.from({ length: count }, () => ({
+        x: Math.random() * W, y: Math.random() * H,
+        vx: (Math.random() - 0.5) * 0.35, vy: (Math.random() - 0.5) * 0.35,
+        r: 0.5 + Math.random() * 1.8,
+        a: 0.15 + Math.random() * 0.45,
+        t: Math.random() * Math.PI * 2, ts: 0.01 + Math.random() * 0.018,
+        color: Math.random() > 0.15 ? '#00b4ff' : '#00ffb0',
+      }));
+    }
 
-  // ── Mouse / touch ──
-  let mouseX = -1000, mouseY = -1000;
-  window.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
-  window.addEventListener('touchmove', e => {
-    if (e.touches.length > 0) { mouseX = e.touches[0].clientX; mouseY = e.touches[0].clientY; }
-  }, { passive: true });
+    // Falling code streams
+    const CODE_CHARS = 'アイウエオカキクケコサシスセソタチツテトナニヌネノ01プレスキャン</>{}[]//\\||';
+    function initMeCodeStreams() {
+      const cols = Math.floor(W / 18);
+      meCodeStreams = Array.from({ length: Math.floor(cols * 0.25) }, () => ({
+        x: Math.floor(Math.random() * cols) * 18,
+        y: Math.random() * H,
+        speed: 1.2 + Math.random() * 2.5,
+        chars: Array.from({ length: 8 + Math.floor(Math.random() * 12) }, () => CODE_CHARS[Math.floor(Math.random() * CODE_CHARS.length)]),
+        alpha: 0.06 + Math.random() * 0.18,
+        len: 8 + Math.floor(Math.random() * 12),
+        mutTimer: 0,
+      }));
+    }
 
-  // ── Card tilt ──
-  const card = document.getElementById('card');
-  document.addEventListener('mousemove', e => {
-    const cx = W/2, cy = H/2;
-    const tX = ((e.clientY - cy) / cy) * -8;
-    const tY = ((e.clientX - cx) / cx) *  8;
-    card.style.transform = `translate(-50%, -50%) perspective(1000px) rotateX(${tX}deg) rotateY(${tY}deg)`;
-  });
-  document.addEventListener('mouseleave', () => {
-    card.style.transform = `translate(-50%, -50%) perspective(1000px) rotateX(0deg) rotateY(0deg)`;
-  });
+    function drawMeParticles() {
+      meParCtx.clearRect(0, 0, W, H);
+      meParticles.forEach(p => {
+        p.t += p.ts; p.x += p.vx; p.y += p.vy;
+        if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
+        if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
+        const al = p.a * (0.6 + 0.4 * Math.sin(p.t));
+        meParCtx.save(); meParCtx.globalAlpha = al;
+        // glow
+        const gr = meParCtx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 4);
+        gr.addColorStop(0, p.color); gr.addColorStop(1, 'transparent');
+        meParCtx.fillStyle = gr; meParCtx.fillRect(p.x - p.r * 4, p.y - p.r * 4, p.r * 8, p.r * 8);
+        meParCtx.fillStyle = p.color;
+        meParCtx.beginPath(); meParCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2); meParCtx.fill();
+        meParCtx.restore();
+      });
 
-  // ── Main loop ──
-  function loop() {
-    drawBackground();
-    drawRain();
-    pelCtx.clearRect(0, 0, W, H);
-    petals.forEach(p => { p.update(mouseX, mouseY); p.draw(); });
-    drawRipples();
-    animateDrips();
-    requestAnimationFrame(loop);
-  }
+      // Code streams
+      meParCtx.save(); meParCtx.font = `${isMobile() ? 10 : 12}px 'Share Tech Mono',monospace`;
+      meCodeStreams.forEach(s => {
+        s.y += s.speed; s.mutTimer++;
+        if (s.mutTimer > 8) { s.chars[Math.floor(Math.random() * s.chars.length)] = CODE_CHARS[Math.floor(Math.random() * CODE_CHARS.length)]; s.mutTimer = 0; }
+        if (s.y > H + s.len * 14) { s.y = -s.len * 14; s.x = Math.floor(Math.random() * Math.floor(W / 18)) * 18; }
+        s.chars.forEach((ch, ci) => {
+          const cy = s.y + ci * 14;
+          if (cy < 0 || cy > H) return;
+          const fade = 1 - (ci / s.len);
+          meParCtx.fillStyle = ci === 0 ? `rgba(180,255,255,${s.alpha * 1.8})` : `rgba(0,180,255,${s.alpha * fade})`;
+          meParCtx.fillText(ch, s.x, cy);
+        });
+      });
+      meParCtx.restore();
+    }
 
-  // ── Init ──
-  function init() {
-    W = window.innerWidth; H = window.innerHeight; POND_Y = H * POND_RATIO;
-    [bgCtx, rainCtx, ripCtx, pelCtx].forEach(ctx => { ctx.canvas.width = W; ctx.canvas.height = H; });
-    initStars(); initLotuses(); initRain(); initPetals();
-  }
+    // Glitch effect on name
+    let glitchTimer = 0;
+    function triggerGlitch() {
+      const el = document.getElementById('me-name');
+      if (!el) return;
+      el.classList.add('glitch');
+      setTimeout(() => el.classList.remove('glitch'), 220);
+    }
 
-  window.addEventListener('resize', init);
-  init();
-  loop();
-</script>
+    // Me card tilt
+    document.addEventListener('mousemove', e => {
+      if (currentPage !== 1) return;
+      const cx = W / 2, cy = H / 2;
+      const tX = ((e.clientY - cy) / cy) * -6, tY = ((e.clientX - cx) / cx) * 6;
+      document.getElementById('me-card').style.transform = `translate(-50%,-50%) perspective(1000px) rotateX(${tX}deg) rotateY(${tY}deg)`;
+    });
+    document.addEventListener('mouseleave', () => {
+      document.getElementById('her-card').style.transform = 'translate(-50%,-50%)';
+      document.getElementById('me-card').style.transform = 'translate(-50%,-50%)';
+    });
+
+    // ══════════════════════════════════════════
+    //  MAIN LOOP
+    // ══════════════════════════════════════════
+    function loop() {
+      // Her scene (always run so it's ready on dissolve)
+      drawHerBg(); drawHerRain(); drawHerPetals(); drawHerRipples(); animateHerDrips();
+      // My scene
+      drawMeBg(); drawMeParticles();
+      // Glitch random trigger
+      glitchTimer++;
+      if (glitchTimer > 180 + Math.floor(Math.random() * 240)) { triggerGlitch(); glitchTimer = 0; }
+      requestAnimationFrame(loop);
+    }
+
+    // ══════════════════════════════════════════
+    //  INIT & RESIZE
+    // ══════════════════════════════════════════
+    function init() {
+      W = window.innerWidth; H = window.innerHeight; POND_Y = H * POND_RATIO;
+      initHer(); initMe();
+    }
+    window.addEventListener('resize', init);
+    init();
+    loop();
+  </script>
 </body>
+
 </html>
